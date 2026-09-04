@@ -82,6 +82,9 @@
     lastToggleClosing=!collapsed.has(id);
     collapsed.has(id)?collapsed.delete(id):collapsed.add(id);
     render(true);
+    // Seperti referensi: setiap cabang dibuka/ditutup, kamera ikut mundur/maju
+    // dan menengahkan kembali pohon agar komposisinya tetap nyaman dilihat.
+    requestAnimationFrame(()=>requestAnimationFrame(()=>smartFrameAfterToggle(lastToggleClosing)));
   }
 
   function render(animate=true){
@@ -153,14 +156,38 @@
     else world.style.transform=`translate(${tx}px,${ty}px) scale(${scale})`;
   }
   function resetView(){fitVisible();}
-  function fitVisible(){
-    const {vis,pos}=layout(); if(!vis.length) return;
+  function visibleBounds(){
+    const {vis,pos}=layout(); if(!vis.length) return null;
     let minX=Infinity,minY=Infinity,maxX=-Infinity,maxY=-Infinity;
-    vis.forEach(p=>{const q=pos.get(p.id); const w=(p.generation||0)===0?360:265; const h=88; minX=Math.min(minX,q.x);minY=Math.min(minY,q.y);maxX=Math.max(maxX,q.x+w);maxY=Math.max(maxY,q.y+h);});
-    const pad=70, vw=viewport.clientWidth, vh=viewport.clientHeight;
-    const bw=Math.max(1,maxX-minX), bh=Math.max(1,maxY-minY);
-    scale=Math.max(.28,Math.min(1.12,(vw-pad*2)/bw,(vh-pad*2)/bh));
-    tx=(vw-bw*scale)/2-minX*scale; ty=(vh-bh*scale)/2-minY*scale; transform();
+    vis.forEach(p=>{
+      const q=pos.get(p.id), w=(p.generation||0)===0?360:265, h=88;
+      minX=Math.min(minX,q.x); minY=Math.min(minY,q.y);
+      maxX=Math.max(maxX,q.x+w); maxY=Math.max(maxY,q.y+h);
+    });
+    return {minX,minY,maxX,maxY,bw:Math.max(1,maxX-minX),bh:Math.max(1,maxY-minY)};
+  }
+  function frameBounds(bounds,{pad=70,maxScale=1.12,minScale=.28,neverZoomIn=false}={}){
+    if(!bounds) return;
+    const vw=viewport.clientWidth, vh=viewport.clientHeight;
+    let target=Math.max(minScale,Math.min(maxScale,(vw-pad*2)/bounds.bw,(vh-pad*2)/bounds.bh));
+    if(neverZoomIn) target=Math.min(scale,target);
+    scale=target;
+    tx=(vw-bounds.bw*scale)/2-bounds.minX*scale;
+    ty=(vh-bounds.bh*scale)/2-bounds.minY*scale;
+    transform();
+  }
+  function fitVisible(){frameBounds(visibleBounds());}
+  function smartFrameAfterToggle(closing){
+    const bounds=visibleBounds(); if(!bounds) return;
+    const mobile=viewport.clientWidth<=680;
+    // Saat membuka, jangan memperbesar kamera: hanya mundur bila perlu lalu center.
+    // Saat menutup, kamera boleh maju perlahan tetapi dibatasi agar tidak terlalu dekat.
+    frameBounds(bounds,{
+      pad:mobile?34:58,
+      maxScale:mobile?.92:1.04,
+      minScale:.28,
+      neverZoomIn:!closing
+    });
   }
   function focusRootIntro(){
     const roots=people.filter(p=>!p.parent_id); if(!roots.length) return;
