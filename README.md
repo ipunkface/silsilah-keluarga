@@ -81,3 +81,17 @@ Tombol **RESET** sekarang menyesuaikan zoom agar seluruh cabang yang sedang terb
 - Animasi node, garis, zoom, dan pan diperlambat serta diperhalus.
 - Intro foto leluhur, tombol Ketuk di sini, dan jari penunjuk dipertahankan.
 - Menu bawah GENERASI / CHAT BANI / DIBUAT OLEH tetap tersedia.
+
+## V2.6 Auto Camera
+Saat node dibuka/ditutup, kamera otomatis menyesuaikan zoom dan posisi agar pohon tetap berada di tengah seperti referensi. Saat cabang dibuka kamera hanya mundur bila perlu; saat ditutup kamera dapat maju kembali secara lembut.
+
+
+## Perbaikan V2.6.1
+- Menambahkan cache-busting pada style.css dan app.js agar GitHub Pages tidak mencampur file versi lama/baru setelah update.
+- Menambahkan critical CSS fallback agar halaman tidak tampil polos saat stylesheet sedang belum termuat.
+
+
+## V2.7
+- Seluruh kartu anggota dapat diklik untuk buka/tutup, tidak wajib tepat pada tombol +/-.
+- Area klik diberi toleransi tambahan saat pohon sedang zoom kecil.
+- Jarak leluhur utama ke generasi pertama diperlebar dan framing kamera menempatkan leluhur sedikit ke kiri agar komposisi lebih nyaman.
