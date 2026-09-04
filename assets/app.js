@@ -174,10 +174,51 @@
   function revealAncestors(id){let p=people.find(x=>x.id===id);while(p?.parent_id){collapsed.delete(p.parent_id);p=people.find(x=>x.id===p.parent_id)}}
   function search(){showIntro(false);const q=$('#searchInput').value.trim().toLowerCase();document.querySelectorAll('.tree-node').forEach(n=>n.classList.remove('match'));if(q.length<2)return;const hit=people.find(p=>(p.name+' '+p.spouse).toLowerCase().includes(q));if(!hit)return;revealAncestors(hit.id);render(true);setTimeout(()=>{const el=document.querySelector(`[data-id="${CSS.escape(hit.id)}"]`);if(el){el.classList.add('match');const x=parseFloat(el.style.left),y=parseFloat(el.style.top);scale=1;tx=viewport.clientWidth/2-x-130;ty=viewport.clientHeight/2-y-50;transform();}},80);}
 
-  viewport.addEventListener('wheel',e=>{e.preventDefault();const rect=viewport.getBoundingClientRect(),mx=e.clientX-rect.left,my=e.clientY-rect.top;const old=scale;scale=Math.min(1.8,Math.max(.35,scale*(e.deltaY<0?1.1:.9)));tx=mx-(mx-tx)*(scale/old);ty=my-(my-ty)*(scale/old);transform();},{passive:false});
-  viewport.addEventListener('pointerdown',e=>{if(e.target.closest('.tree-node')) return; dragging=true;moved=false;downX=e.clientX;downY=e.clientY;viewport.classList.add('dragging');sx=e.clientX-tx;sy=e.clientY-ty;viewport.setPointerCapture(e.pointerId);world.style.transition='none';});
-  viewport.addEventListener('pointermove',e=>{if(!dragging)return;if(Math.abs(e.clientX-downX)>4||Math.abs(e.clientY-downY)>4)moved=true;tx=e.clientX-sx;ty=e.clientY-sy;transform(true)});
-  viewport.addEventListener('pointerup',()=>{dragging=false;viewport.classList.remove('dragging');world.style.transition='';setTimeout(()=>moved=false,0)});
+  viewport.addEventListener('wheel',e=>{e.preventDefault();const rect=viewport.getBoundingClientRect(),mx=e.clientX-rect.left,my=e.clientY-rect.top;const old=scale;scale=Math.min(2.2,Math.max(.28,scale*(e.deltaY<0?1.1:.9)));tx=mx-(mx-tx)*(scale/old);ty=my-(my-ty)*(scale/old);transform();},{passive:false});
+
+  // Mobile/desktop pan + pinch zoom. Satu jari menggeser pohon; dua jari memperbesar/memperkecil.
+  const pointers=new Map();
+  let gesture='none', pinchStartDist=0, pinchStartScale=1, pinchWorldX=0, pinchWorldY=0;
+  const localPoint=e=>{const r=viewport.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}};
+  const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+  const mid=(a,b)=>({x:(a.x+b.x)/2,y:(a.y+b.y)/2});
+  function finishGesture(){
+    if(!pointers.size){dragging=false;gesture='none';viewport.classList.remove('dragging');world.style.transition='';setTimeout(()=>moved=false,40);return;}
+    if(pointers.size===1){
+      const a=[...pointers.values()][0]; gesture='pan'; dragging=true; downX=a.x;downY=a.y;sx=a.x-tx;sy=a.y-ty;
+    }
+  }
+  viewport.addEventListener('pointerdown',e=>{
+    if(e.pointerType==='mouse'&&e.button!==0)return;
+    if(e.target.closest('.toggle,.intro-hero button,input,select,textarea,a'))return;
+    const p=localPoint(e); pointers.set(e.pointerId,p);
+    try{viewport.setPointerCapture(e.pointerId)}catch(_){}
+    dragging=true; viewport.classList.add('dragging'); world.style.transition='none';
+    if(pointers.size===1){gesture='pan';moved=false;downX=p.x;downY=p.y;sx=p.x-tx;sy=p.y-ty;}
+    else if(pointers.size>=2){
+      const [a,b]=[...pointers.values()].slice(0,2),m=mid(a,b); gesture='pinch';moved=true;
+      pinchStartDist=Math.max(20,dist(a,b)); pinchStartScale=scale;
+      pinchWorldX=(m.x-tx)/scale; pinchWorldY=(m.y-ty)/scale;
+    }
+  });
+  viewport.addEventListener('pointermove',e=>{
+    if(!pointers.has(e.pointerId))return;
+    const p=localPoint(e); pointers.set(e.pointerId,p);
+    if(pointers.size>=2){
+      const [a,b]=[...pointers.values()].slice(0,2),m=mid(a,b);
+      if(gesture!=='pinch'){gesture='pinch';pinchStartDist=Math.max(20,dist(a,b));pinchStartScale=scale;pinchWorldX=(m.x-tx)/scale;pinchWorldY=(m.y-ty)/scale;}
+      const ns=Math.min(2.2,Math.max(.28,pinchStartScale*(dist(a,b)/pinchStartDist)));
+      scale=ns;tx=m.x-pinchWorldX*scale;ty=m.y-pinchWorldY*scale;moved=true;transform(true);return;
+    }
+    if(gesture==='pan'&&dragging){
+      if(Math.abs(p.x-downX)>4||Math.abs(p.y-downY)>4)moved=true;
+      tx=p.x-sx;ty=p.y-sy;transform(true);
+    }
+  });
+  const pointerEnd=e=>{pointers.delete(e.pointerId);finishGesture()};
+  viewport.addEventListener('pointerup',pointerEnd);
+  viewport.addEventListener('pointercancel',pointerEnd);
+  viewport.addEventListener('lostpointercapture',e=>{if(pointers.has(e.pointerId)){pointers.delete(e.pointerId);finishGesture()}});
 
   $('#resetBtn').onclick=()=>{
     showIntro(false);
