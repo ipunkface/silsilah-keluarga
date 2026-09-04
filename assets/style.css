@@ -77,3 +77,10 @@ body.no-tree-effects .lines path{animation:none!important;stroke-dasharray:none!
 @media(max-width:680px){
   .tree-node.has-children:active{transform:scale(.995)}
 }
+
+
+/* V2.8 — PWA / Android install */
+.install-app{background:#16a36a!important;color:#fff!important;white-space:nowrap}
+.install-app.ready{animation:installPulse 1.8s ease-in-out infinite;box-shadow:0 0 0 0 rgba(22,163,106,.35)}
+@keyframes installPulse{50%{transform:translateY(-1px);box-shadow:0 0 0 8px rgba(22,163,106,0)}}
+@media(max-width:680px){.install-app{width:auto!important;flex:1 1 160px}}
