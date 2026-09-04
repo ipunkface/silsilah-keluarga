@@ -1,0 +1,24 @@
+{
+  "name": "Silsilah Keluarga Besar",
+  "short_name": "Silsilah",
+  "description": "Pohon silsilah keluarga interaktif yang terhubung ke Supabase.",
+  "lang": "id-ID",
+  "id": "./",
+  "start_url": "./?source=pwa",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "orientation": "any",
+  "background_color": "#faf9f5",
+  "theme_color": "#ffffff",
+  "categories": ["family", "utilities"],
+  "icons": [
+    {"src":"icons/icon-192.png","sizes":"192x192","type":"image/png","purpose":"any"},
+    {"src":"icons/icon-512.png","sizes":"512x512","type":"image/png","purpose":"any"},
+    {"src":"icons/maskable-512.png","sizes":"512x512","type":"image/png","purpose":"maskable"}
+  ],
+  "shortcuts": [
+    {"name":"Buka Silsilah","short_name":"Silsilah","url":"./","icons":[{"src":"icons/icon-192.png","sizes":"192x192"}]},
+    {"name":"Admin Silsilah","short_name":"Admin","url":"./admin.html","icons":[{"src":"icons/icon-192.png","sizes":"192x192"}]}
+  ]
+}
