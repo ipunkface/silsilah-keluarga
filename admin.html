@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin Silsilah</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body class="admin-body">
+<header class="admin-header">
+  <div><strong>ADMIN SILSILAH</strong><small>Tambah, edit, hapus anggota keluarga</small></div>
+  <a href="index.html">← Kembali ke Silsilah</a>
+</header>
+
+<section class="admin-wrap">
+  <div id="setupNotice" class="notice">
+    Supabase belum dikonfigurasi. Isi <code>supabase-config.js</code> dengan Project URL dan publishable key. Jangan pernah menaruh secret/service role key di GitHub.
+  </div>
+
+  <div id="loginPanel" class="panel login-panel">
+    <h2>Login Admin</h2>
+    <input id="email" type="email" placeholder="Email admin">
+    <input id="password" type="password" placeholder="Password">
+    <button id="loginBtn">Masuk</button>
+    <div id="loginMsg" class="muted"></div>
+  </div>
+
+  <div id="adminPanel" class="admin-grid hidden">
+    <section class="panel form-panel">
+      <div class="panel-head"><h2 id="formTitle">Tambah Anggota</h2><button id="logoutBtn" class="secondary">Logout</button></div>
+      <form id="memberForm">
+        <input type="hidden" id="rowId">
+        <label>Silsilah<select id="treeKey"><option value="keluarga-besar">Keluarga Besar Hi Nawawi</option><option value="saudara-mainem">Saudara Biyung Mainem</option></select></label>
+        <label>Nama<input id="name" required></label>
+        <label>Pasangan<input id="spouse"></label>
+        <label>Orang tua<select id="parent"></select></label>
+        <div class="two"><label>Urutan anak<input id="childOrder" type="number" min="1"></label><label>Generasi<input id="generation" type="number" min="0"></label></div>
+        <label>Cabang<input id="branch"></label>
+        <label>Catatan<textarea id="note" rows="3"></textarea></label>
+        <label class="check"><input id="isPublic" type="checkbox" checked> Tampilkan ke publik</label>
+        <div class="actions"><button type="submit">Simpan</button><button type="button" id="cancelBtn" class="secondary">Batal</button></div>
+      </form>
+    </section>
+
+    <section class="panel list-panel">
+      <div class="panel-head"><h2>Data Anggota</h2><input id="adminSearch" type="search" placeholder="Cari nama..."></div>
+      <div id="memberList" class="member-list"></div>
+    </section>
+  </div>
+</section>
+
+<script src="supabase-config.js"></script>
+<script src="assets/admin.js"></script>
+</body>
+</html>

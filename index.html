@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Silsilah Keluarga</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <div class="title" id="pageTitle">SILSILAH KELUARGA BESAR</div>
+    <div class="subtitle">KLIK NODE UNTUK BUKA/TUTUP, SCROLL/DRAG UNTUK ZOOM &amp; PAN</div>
+  </div>
+  <div class="toolbar">
+    <select id="treeSelect" aria-label="Pilih silsilah">
+      <option value="keluarga-besar">Keluarga Besar Hi Nawawi</option>
+      <option value="saudara-mainem">Saudara Biyung Mainem</option>
+    </select>
+    <input id="searchInput" type="search" placeholder="cari nama (min. 2 huruf)...">
+    <button id="resetBtn" title="Buka seluruh silsilah dan tampilkan semuanya">RESET</button>
+    <button id="openAllBtn" title="Buka seluruh cabang">BUKA SEMUA</button>
+    <button id="closeAllBtn" title="Tutup seluruh cabang dan kembali ke leluhur">TUTUP SEMUA</button>
+    <button id="effectBtn" class="dark">⚡ EFEK: ON</button>
+  </div>
+</header>
+
+<main id="viewport" class="viewport">
+  <div id="world" class="world">
+    <svg id="lines" class="lines" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div id="nodes"></div>
+  </div>
+  <div id="introHero" class="intro-hero" aria-label="Mulai membuka silsilah">
+    <button id="introPhotoBtn" class="ancestor-photo" type="button" title="Ketuk untuk membuka silsilah">
+      <span class="flower-ring" aria-hidden="true"></span>
+      <img src="assets/foto-leluhur.jpg" alt="Foto leluhur" onerror="this.style.display='none'">
+    </button>
+    <button id="introTap" class="intro-tap" type="button">Ketuk di sini</button>
+    <div class="finger" aria-hidden="true">👇</div>
+  </div>
+</main>
+
+<aside class="legend" id="legend">
+  <h3>GENERASI KE ATAS / BAWAH:</h3>
+  <ol>
+    <li>BAPAK/IBU-ANAK/PUTRA</li>
+    <li>SI MBAH-PUTU/WAYAH</li>
+    <li>BUYUT</li>
+    <li>CANGGAH</li>
+    <li>WARENG</li>
+    <li>UDHEG-UDHEG</li>
+    <li>GANTUNG SIWUR</li>
+    <li>GROPAK SENTHE</li>
+    <li>DEBOG BOSOK</li>
+    <li>GALIH ASEM</li>
+  </ol>
+</aside>
+
+<div class="bottom-actions">
+  <button id="legendToggle">GENERASI</button>
+  <button id="chatToggle">CHAT BANI</button>
+  <button id="aboutToggle">DIBUAT OLEH</button>
+</div>
+
+<div class="modal" id="profileModal" aria-hidden="true">
+  <div class="modal-card">
+    <button class="close" id="closeModal">×</button>
+    <div class="avatar" id="profileAvatar">👤</div>
+    <h2 id="profileName"></h2>
+    <div id="profileSpouse" class="spouse"></div>
+    <div id="profileMeta" class="meta"></div>
+    <div id="profileNote" class="note"></div>
+  </div>
+</div>
+
+<div class="modal" id="chatModal" aria-hidden="true">
+  <div class="modal-card chat-card">
+    <button class="close" id="closeChat">×</button>
+    <h2>💬 Chat &amp; Saran Keluarga</h2>
+    <p class="meta">Pesan pada versi ini disimpan di perangkat/browser masing-masing. Untuk chat bersama lintas perangkat, tabel chat dapat diaktifkan di Supabase.</p>
+    <div id="chatList" class="chat-list"></div>
+    <form id="chatForm" class="chat-form">
+      <input id="chatName" maxlength="40" placeholder="Nama" required>
+      <textarea id="chatMessage" maxlength="300" rows="3" placeholder="Tulis pesan atau saran..." required></textarea>
+      <button type="submit">Kirim Pesan</button>
+    </form>
+  </div>
+</div>
+
+<div class="modal" id="aboutModal" aria-hidden="true">
+  <div class="modal-card">
+    <button class="close" id="closeAbout">×</button>
+    <h2>Dibuat Oleh</h2>
+    <p class="meta">Website silsilah keluarga interaktif.</p>
+    <p class="note">Pengelola dapat mengubah data melalui halaman Admin.</p>
+    <p><a class="admin-link" href="admin.html">Buka Admin Silsilah</a></p>
+  </div>
+</div>
+
+<script src="supabase-config.js"></script>
+<script src="data.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>

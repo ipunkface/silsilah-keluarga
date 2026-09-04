@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="420" height="420" viewBox="0 0 420 420">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#eef5ff"/><stop offset="1" stop-color="#fff6df"/></linearGradient>
+  </defs>
+  <rect width="420" height="420" rx="210" fill="url(#bg)"/>
+  <circle cx="145" cy="155" r="54" fill="#d7c0ad"/>
+  <path d="M65 330c12-78 51-119 80-119s68 41 80 119" fill="#334b67"/>
+  <circle cx="275" cy="155" r="54" fill="#d7c0ad"/>
+  <path d="M195 330c12-78 51-119 80-119s68 41 80 119" fill="#7e6d78"/>
+  <text x="210" y="378" text-anchor="middle" font-family="Arial,sans-serif" font-size="25" font-weight="700" fill="#53657d">FOTO LELUHUR</text>
+</svg>
