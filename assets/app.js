@@ -39,10 +39,13 @@
     const vis=visibleSet(); const map=new Map(vis.map(p=>[p.id,p])); const kids=new Map();
     vis.forEach(p=>kids.set(p.id,childrenOf(p.id).filter(c=>map.has(c.id))));
     let nextY=40; const pos=new Map(); const rowH=112, xGap=335;
+    // Generasi pertama diberi jarak ekstra dari leluhur utama supaya kartu induk
+    // tidak bertumpuk dengan anak-anaknya ketika kamera melakukan zoom-out.
+    const xForGeneration=gen=>gen<=0?70:70+520+(gen-1)*xGap;
     function place(p){
       const cs=kids.get(p.id)||[];
-      if(!cs.length){pos.set(p.id,{x:70+(p.generation||0)*xGap,y:nextY});nextY+=rowH;return pos.get(p.id).y;}
-      const ys=cs.map(place); const y=(ys[0]+ys[ys.length-1])/2; pos.set(p.id,{x:70+(p.generation||0)*xGap,y}); return y;
+      if(!cs.length){pos.set(p.id,{x:xForGeneration(p.generation||0),y:nextY});nextY+=rowH;return pos.get(p.id).y;}
+      const ys=cs.map(place); const y=(ys[0]+ys[ys.length-1])/2; pos.set(p.id,{x:xForGeneration(p.generation||0),y}); return y;
     }
     vis.filter(p=>!p.parent_id).forEach(place);
     return {vis,pos,width:Math.max(1300,...[...pos.values()].map(v=>v.x+430)),height:Math.max(760,nextY+100)};
@@ -111,17 +114,17 @@
       }
 
       const el=document.createElement('div'); const gen=p.generation||0;
-      el.className='tree-node '+(gen===0?'root':'g'+Math.min(gen,5));
+      const kids=childrenOf(p.id);
+      el.className='tree-node '+(gen===0?'root':'g'+Math.min(gen,5))+(kids.length?' has-children':'');
       const cur=pos.get(p.id); el.style.left=cur.x+'px';el.style.top=cur.y+'px';el.dataset.id=p.id;
       el.innerHTML=`<div class="name">${escapeHtml(p.name)}</div>${p.spouse?`<div class="spouse">${escapeHtml(p.spouse)}</div>`:''}${p.order?`<div class="order">ANAK KE-${p.order}</div>`:''}`;
-      const kids=childrenOf(p.id);
       if(kids.length){
         const t=document.createElement('button'); t.type='button'; t.className='toggle'; t.textContent=collapsed.has(p.id)?'+':'−'; t.title=collapsed.has(p.id)?'Buka keturunan':'Tutup keturunan';
         t.addEventListener('pointerdown',e=>e.stopPropagation());
         t.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();toggleNode(p.id);});
         el.appendChild(t);
       }
-      el.addEventListener('click',e=>{ if(moved) return; if(kids.length) toggleNode(p.id); else showProfile(p); });
+      el.addEventListener('click',e=>{ if(moved) return; activateNodeByElement(el); });
       el.addEventListener('dblclick',e=>{e.preventDefault();e.stopPropagation();showProfile(p);});
       nodesEl.appendChild(el);
 
@@ -166,13 +169,32 @@
     });
     return {minX,minY,maxX,maxY,bw:Math.max(1,maxX-minX),bh:Math.max(1,maxY-minY)};
   }
-  function frameBounds(bounds,{pad=70,maxScale=1.12,minScale=.28,neverZoomIn=false}={}){
+  function frameBounds(bounds,{pad=70,maxScale=1.12,minScale=.28,neverZoomIn=false,rootCompose=true}={}){
     if(!bounds) return;
     const vw=viewport.clientWidth, vh=viewport.clientHeight;
     let target=Math.max(minScale,Math.min(maxScale,(vw-pad*2)/bounds.bw,(vh-pad*2)/bounds.bh));
     if(neverZoomIn) target=Math.min(scale,target);
     scale=target;
+
+    // Komposisi seperti referensi: leluhur utama tidak berada tepat di tengah layar.
+    // Ia sedikit "mundur" ke kiri sehingga ruang keturunan di kanan terasa lapang.
     tx=(vw-bounds.bw*scale)/2-bounds.minX*scale;
+    if(rootCompose){
+      const roots=people.filter(p=>!p.parent_id);
+      const root=roots[0];
+      const q=root?layout().pos.get(root.id):null;
+      if(q){
+        const rootW=(root.generation||0)===0?360:265;
+        const desiredRootCenter=vw*(vw<=680?.27:.24);
+        let candidate=desiredRootCenter-(q.x+rootW/2)*scale;
+        // Tetap pastikan sisi kanan/kiri pohon tidak keluar layar.
+        const left=bounds.minX*scale+candidate;
+        const right=bounds.maxX*scale+candidate;
+        if(right>vw-pad) candidate-=right-(vw-pad);
+        if(left<pad) candidate+=pad-left;
+        tx=candidate;
+      }
+    }
     ty=(vh-bounds.bh*scale)/2-bounds.minY*scale;
     transform();
   }
@@ -200,6 +222,28 @@
   function showProfile(p){$('#profileName').textContent=p.name;$('#profileSpouse').textContent=p.spouse?`Pasangan: ${p.spouse}`:'';$('#profileMeta').textContent=`Generasi ${p.generation||0}${p.branch?' • '+p.branch:''}${p.order?' • Anak ke-'+p.order:''}`;$('#profileNote').textContent=p.note||'';$('#profileModal').classList.add('show');}
   function revealAncestors(id){let p=people.find(x=>x.id===id);while(p?.parent_id){collapsed.delete(p.parent_id);p=people.find(x=>x.id===p.parent_id)}}
   function search(){showIntro(false);const q=$('#searchInput').value.trim().toLowerCase();document.querySelectorAll('.tree-node').forEach(n=>n.classList.remove('match'));if(q.length<2)return;const hit=people.find(p=>(p.name+' '+p.spouse).toLowerCase().includes(q));if(!hit)return;revealAncestors(hit.id);render(true);setTimeout(()=>{const el=document.querySelector(`[data-id="${CSS.escape(hit.id)}"]`);if(el){el.classList.add('match');const x=parseFloat(el.style.left),y=parseFloat(el.style.top);scale=1;tx=viewport.clientWidth/2-x-130;ty=viewport.clientHeight/2-y-50;transform();}},80);}
+
+  function activateNodeByElement(el){
+    if(!el) return;
+    const p=people.find(x=>x.id===el.dataset.id); if(!p) return;
+    childrenOf(p.id).length?toggleNode(p.id):showProfile(p);
+  }
+
+  // Saat pohon sedang sangat kecil, pengguna tidak perlu membidik tombol +.
+  // Klik/tap di sekitar kartu (dengan toleransi piksel layar) tetap dianggap memilih kartu.
+  viewport.addEventListener('click',e=>{
+    if(moved||e.target.closest('.tree-node,.toggle,.intro-hero,button,input,select,textarea,a,.modal')) return;
+    const px=e.clientX, py=e.clientY;
+    let best=null, bestD=Infinity;
+    nodesEl.querySelectorAll('.tree-node[data-id]').forEach(el=>{
+      const r=el.getBoundingClientRect();
+      const dx=px<r.left?r.left-px:px>r.right?px-r.right:0;
+      const dy=py<r.top?r.top-py:py>r.bottom?py-r.bottom:0;
+      const d=Math.hypot(dx,dy);
+      if(d<bestD){bestD=d;best=el;}
+    });
+    if(best&&bestD<=26) activateNodeByElement(best);
+  });
 
   viewport.addEventListener('wheel',e=>{e.preventDefault();const rect=viewport.getBoundingClientRect(),mx=e.clientX-rect.left,my=e.clientY-rect.top;const old=scale;scale=Math.min(2.2,Math.max(.28,scale*(e.deltaY<0?1.1:.9)));tx=mx-(mx-tx)*(scale/old);ty=my-(my-ty)*(scale/old);transform();},{passive:false});
 

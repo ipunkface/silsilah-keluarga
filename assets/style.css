@@ -68,3 +68,12 @@ body.no-tree-effects .lines path{animation:none!important;stroke-dasharray:none!
 @media(max-width:680px){
   .world{transition-duration:820ms}
 }
+\n\n/* V2.7 — klik kartu lebih mudah + komposisi leluhur lebih seimbang */
+.tree-node.has-children{cursor:pointer}
+.tree-node.has-children:hover{box-shadow:0 11px 26px rgba(26,45,76,.18)}
+.tree-node.has-children:active{filter:brightness(.97)}
+/* Tanda +/- tetap menjadi petunjuk visual, tetapi seluruh kartu adalah area klik. */
+.tree-node .toggle{z-index:3}
+@media(max-width:680px){
+  .tree-node.has-children:active{transform:scale(.995)}
+}
