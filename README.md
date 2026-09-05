@@ -1,97 +1,71 @@
-# Silsilah Keluarga – GitHub Pages + Supabase
+# Silsilah Keluarga V2.6 — Multi Pasangan
 
-Versi ini dibuat dari file Excel `Copy of SILSILAH KELUARGA.xlsx` dan dapat langsung tampil di GitHub Pages. Tanpa Supabase, website membaca `data.js` sebagai data awal. Setelah Supabase dikonfigurasi, website membaca data publik dari database dan halaman `admin.html` dapat digunakan untuk tambah/edit/hapus.
+Versi ini meneruskan V2.5 (GitHub Pages + Supabase + mobile pan/pinch) dan menambahkan **pasangan terstruktur** serta **jalur anak berdasarkan pasangan**.
 
-## Data yang sudah dimasukkan
-- Silsilah keluarga besar Hi Nawawi: 114 entri termasuk root.
-- Saudara Biyung Mainem / Tunggal Mbah: 61 entri termasuk root.
-- Total data awal: 175 entri.
+## Yang baru
 
-Karena sumber Excel memakai tata letak bertingkat dan beberapa nama pasangan digabung dengan `&` atau `+`, hasil konversi mempertahankan isi teks sumber. Sebaiknya cek hubungan orang tua/pasangan sebelum dipublikasikan permanen.
+- Satu anggota dapat mempunyai lebih dari satu pasangan.
+- Setiap pasangan mempunyai **urutan** dan **sebutan**: misalnya `Istri ke-1`, `Istri ke-2`, `Istri ke-3`, atau `Suami ke-1`.
+- Saat menambah/edit anak, Admin dapat memilih **Orang tua utama** lalu **Dari pasangan / ibu-ayah yang mana?**.
+- Node orang yang memiliki beberapa pasangan menampilkan pasangan satu per satu, bukan satu teks panjang.
+- Anak yang sudah ditautkan menampilkan badge `DARI ISTRI KE-2: ...` dan garis keturunannya diberi pembeda visual.
+- Daftar Admin memberi peringatan bila orang tua memiliki beberapa pasangan tetapi jalur anak belum dipilih.
+- Data pasangan lama tetap disinkronkan ke kolom `spouse` untuk kompatibilitas versi lama.
 
-## Jalankan lokal
-Buka `index.html` langsung di browser atau gunakan Live Server. Tidak perlu PHP/MySQL.
+## PENTING — upgrade database yang sudah dipakai
 
-## Pasang ke GitHub Pages
-1. Buat repository baru.
-2. Upload semua isi folder ini ke branch `main`.
-3. Settings > Pages > Deploy from a branch > `main` > `/root`.
-4. Tunggu GitHub memberi URL Pages.
+Karena Supabase Anda sebelumnya sudah memakai V2.5, **jangan hapus database dan jangan import seed ulang**.
 
-## Aktifkan Supabase agar bisa edit/tambah data
-1. Buat project di Supabase.
-2. Buka SQL Editor dan jalankan `supabase-schema.sql`.
-3. Jalankan `supabase-seed.sql` sekali untuk memasukkan data awal.
-4. Authentication > Users > buat user admin dengan email/password.
-5. Salin UUID user admin, lalu jalankan:
-   `insert into public.admin_users(user_id) values ('UUID-ADMIN');`
-6. Project Settings > API: salin Project URL dan **anon public key**.
-7. Isi `supabase-config.js`:
-   ```js
-   window.SUPABASE_CONFIG = {
-     url: "https://xxxx.supabase.co",
-     anonKey: "eyJ..."
-   };
-   ```
-8. Upload perubahan `supabase-config.js` ke GitHub.
-9. Buka `admin.html`, login, lalu tambah/edit data.
+1. Buka **Supabase → SQL Editor → New query**.
+2. Buka file `supabase-migration-v2.6-multi-pasangan.sql` dari paket ini.
+3. Copy seluruh isi → paste → klik **Run**.
+4. Setelah `Success`, buka kembali `admin.html` dan refresh.
 
-## Keamanan
-- `anonKey` boleh berada di frontend; keamanan sebenarnya dijaga Row Level Security (RLS).
-- Jangan pernah menaruh `service_role` key, password database, atau secret key di GitHub.
-- Kebijakan RLS dalam `supabase-schema.sql` membuat pengunjung hanya dapat membaca data berstatus publik; tambah/edit/hapus hanya akun yang terdaftar di `admin_users`.
-- Untuk data sensitif seperti nomor telepon/alamat rinci, sebaiknya jangan disimpan sebagai data publik.
+Migrasi ini tidak menghapus anggota. Field pasangan lama akan diubah menjadi tabel `spouses`.
 
-## File penting
-- `index.html` — tampilan silsilah.
-- `admin.html` — halaman pengelolaan data.
-- `data.js` — fallback data awal dari Excel.
-- `supabase-schema.sql` — tabel dan aturan keamanan RLS.
-- `supabase-seed.sql` — data awal hasil konversi Excel.
-- `supabase-config.js` — tempat Project URL + anon key.
+Untuk data saat ini, `Hi NAWAWI` otomatis dibuat menjadi:
 
+- Istri ke-1 — Biyung PLINTHI
+- Istri ke-2 — Biyung NGAISAH
+- Istri ke-3 — Biyung MAINEM
 
-## Konfigurasi Supabase sudah terpasang
-Project URL dan publishable key sudah dimasukkan ke `supabase-config.js`. Publishable key boleh digunakan di frontend/GitHub Pages; jangan pernah menambahkan secret key atau service role key ke repository.
+Data Excel juga sudah mempunyai penanda cabang `Istri 1`, `Istri 2`, `Istri 3`, sehingga anak-anak langsung dihubungkan ke jalur istri yang sesuai selama penanda cabangnya tersedia.
 
-### Uji di localhost
-1. Salin folder `silsilah-github-v2` ke `C:\xampp\htdocs\`.
-2. Jalankan Apache di XAMPP.
-3. Buka `http://localhost/silsilah-github-v2/`.
-4. Buka `http://localhost/silsilah-github-v2/admin.html` untuk login admin.
-5. Gunakan akun admin yang sudah dibuat di Supabase Authentication.
+## Cara mengelola pasangan
 
-### Jika login berhasil tetapi tambah/edit/hapus ditolak
-Pastikan UUID user admin sudah dimasukkan ke tabel `public.admin_users`.
+Di `admin.html`:
 
-## Perbaikan V2.1
-- Tombol + / − kini memakai event khusus dan dapat membuka/menutup cabang satu per satu seperti V1.
-- Klik kartu yang memiliki anak juga membuka/menutup cabang; double-click membuka profil.
-- Drag hanya dimulai dari area kosong agar tidak mengganggu tombol/node.
-- Admin tidak lagi bergantung pada CDN supabase-js; autentikasi dan REST API dipanggil langsung sehingga error `Unexpected token '<'` dapat didiagnosis dengan jelas.
+1. Klik **Edit** pada anggota.
+2. Pada **Data Pasangan**, klik `+ Tambah Pasangan`.
+3. Isi `Urutan`, `Sebutan`, dan `Nama pasangan`.
+4. Contoh:
+   - `1 | Istri ke-1 | Biyung PLINTHI`
+   - `2 | Istri ke-2 | Biyung NGAISAH`
+   - `3 | Istri ke-3 | Biyung MAINEM`
+5. Klik **Simpan**.
 
-## Tampilan foto leluhur
-File `assets/foto-leluhur.jpg` adalah foto pembuka. Ganti file tersebut dengan foto keluarga/leluhur yang diinginkan menggunakan nama file yang sama agar tidak perlu mengubah kode.
+Untuk menentukan seorang anak berasal dari pasangan mana:
 
-Tombol **RESET** sekarang menyesuaikan zoom agar seluruh cabang yang sedang terbuka muat di layar. **TUTUP SEMUA** mengembalikan tampilan pembuka dengan bingkai foto dan animasi jari.
+1. Edit data anak.
+2. Pilih **Orang tua utama**.
+3. Pilih **Dari pasangan / ibu-ayah yang mana?**.
+4. Simpan.
 
+Jika suatu pasangan dihapus, data anak tidak ikut terhapus. Jalur pasangan anak akan dikosongkan dan dapat dipilih kembali.
 
-## Perubahan V2.4
-- RESET sekarang membuka semua cabang lalu otomatis fit seluruh pohon ke layar.
-- Animasi node, garis, zoom, dan pan diperlambat serta diperhalus.
-- Intro foto leluhur, tombol Ketuk di sini, dan jari penunjuk dipertahankan.
-- Menu bawah GENERASI / CHAT BANI / DIBUAT OLEH tetap tersedia.
+## Update GitHub Pages
 
-## V2.6 Auto Camera
-Saat node dibuka/ditutup, kamera otomatis menyesuaikan zoom dan posisi agar pohon tetap berada di tengah seperti referensi. Saat cabang dibuka kamera hanya mundur bila perlu; saat ditutup kamera dapat maju kembali secara lembut.
+Upload/timpa isi paket V2.6 ke repository GitHub yang sama. File utama yang berubah:
 
+- `admin.html`
+- `assets/admin.js`
+- `assets/app.js`
+- `assets/style.css`
+- `supabase-schema.sql`
+- `supabase-migration-v2.6-multi-pasangan.sql`
 
-## Perbaikan V2.6.1
-- Menambahkan cache-busting pada style.css dan app.js agar GitHub Pages tidak mencampur file versi lama/baru setelah update.
-- Menambahkan critical CSS fallback agar halaman tidak tampil polos saat stylesheet sedang belum termuat.
+`supabase-config.js` tetap memakai Project URL dan **publishable key**. Jangan pernah memasukkan `sb_secret_...`, service-role key, atau password database ke GitHub.
 
+## Instalasi baru
 
-## V2.7
-- Seluruh kartu anggota dapat diklik untuk buka/tutup, tidak wajib tepat pada tombol +/-.
-- Area klik diberi toleransi tambahan saat pohon sedang zoom kecil.
-- Jarak leluhur utama ke generasi pertama diperlebar dan framing kamera menempatkan leluhur sedikit ke kiri agar komposisi lebih nyaman.
+Untuk project Supabase baru: jalankan `supabase-schema.sql`, kemudian `supabase-seed.sql`, lalu jalankan `supabase-migration-v2.6-multi-pasangan.sql` untuk mengonversi pasangan dari seed menjadi struktur multi-pasangan.

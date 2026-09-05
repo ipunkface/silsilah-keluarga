@@ -3,9 +3,6 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#ffffff">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="icons/icon-192.png">
 <title>Admin Silsilah</title>
 <link rel="stylesheet" href="assets/style.css">
 </head>
@@ -28,6 +25,8 @@
     <div id="loginMsg" class="muted"></div>
   </div>
 
+  <div id="multiSpouseNotice" class="notice hidden"></div>
+
   <div id="adminPanel" class="admin-grid hidden">
     <section class="panel form-panel">
       <div class="panel-head"><h2 id="formTitle">Tambah Anggota</h2><button id="logoutBtn" class="secondary">Logout</button></div>
@@ -35,8 +34,22 @@
         <input type="hidden" id="rowId">
         <label>Silsilah<select id="treeKey"><option value="keluarga-besar">Keluarga Besar Hi Nawawi</option><option value="saudara-mainem">Saudara Biyung Mainem</option></select></label>
         <label>Nama<input id="name" required></label>
-        <label>Pasangan<input id="spouse"></label>
-        <label>Orang tua<select id="parent"></select></label>
+        
+        <div class="spouse-editor-box">
+          <div class="spouse-editor-head">
+            <div>
+              <strong>Data Pasangan</strong>
+              <small>Pasangan dibuat terpisah agar jalur keturunan dapat dilacak dengan benar.</small>
+            </div>
+            <button type="button" id="addSpouseBtn" class="secondary small-btn">+ Tambah Pasangan</button>
+          </div>
+          <div id="spouseEditor" class="spouse-editor"></div>
+        </div>
+        <label>Orang tua utama<select id="parent"></select></label>
+        <label>Dari pasangan / ibu-ayah yang mana?
+          <select id="parentSpouse"><option value="">— Belum ditentukan —</option></select>
+          <small id="parentSpouseHelp" class="field-help">Pilih orang tua terlebih dahulu. Jika memiliki lebih dari satu pasangan, pilih jalur pasangan agar keturunan tidak rancu.</small>
+        </label>
         <div class="two"><label>Urutan anak<input id="childOrder" type="number" min="1"></label><label>Generasi<input id="generation" type="number" min="0"></label></div>
         <label>Cabang<input id="branch"></label>
         <label>Catatan<textarea id="note" rows="3"></textarea></label>
@@ -54,6 +67,5 @@
 
 <script src="supabase-config.js"></script>
 <script src="assets/admin.js"></script>
-<script src="assets/pwa.js?v=280"></script>
 </body>
 </html>

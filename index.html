@@ -4,18 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Silsilah Keluarga</title>
-<meta name="theme-color" content="#ffffff">
-<meta name="application-name" content="Silsilah Keluarga">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="icons/icon-192.png">
-<link rel="apple-touch-icon" href="icons/icon-192.png">
-<link rel="stylesheet" href="assets/style.css?v=280">
-
-<style id="critical-fallback">
-html,body{margin:0;height:100%;font-family:Arial,sans-serif}body{overflow:hidden}.topbar{min-height:92px;padding:14px 24px;background:#fff;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;justify-content:space-between;gap:14px}.title{font-size:26px;font-weight:800}.subtitle{font-size:13px;color:#64748b}.toolbar{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}.toolbar button,.toolbar input,.toolbar select{min-height:38px}.viewport{position:fixed;left:0;right:0;top:92px;bottom:0;overflow:hidden}.bottom-actions{position:fixed;right:18px;bottom:16px;z-index:15}.legend{position:fixed;left:18px;top:130px;z-index:12;background:#fff;padding:14px;border-radius:12px}@media(max-width:800px){.topbar{align-items:flex-start;flex-direction:column}.viewport{top:150px}.legend{top:165px}.title{font-size:21px}}
-</style>
+<link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
 <header class="topbar">
@@ -33,7 +22,6 @@ html,body{margin:0;height:100%;font-family:Arial,sans-serif}body{overflow:hidden
     <button id="openAllBtn" title="Buka seluruh cabang">BUKA SEMUA</button>
     <button id="closeAllBtn" title="Tutup seluruh cabang dan kembali ke leluhur">TUTUP SEMUA</button>
     <button id="effectBtn" class="dark">⚡ EFEK: ON</button>
-    <button id="installAppBtn" class="install-app" type="button" title="Pasang sebagai aplikasi Android">📲 PASANG APLIKASI</button>
   </div>
 </header>
 
@@ -71,7 +59,7 @@ html,body{margin:0;height:100%;font-family:Arial,sans-serif}body{overflow:hidden
 <div class="bottom-actions">
   <button id="legendToggle">GENERASI</button>
   <button id="chatToggle">CHAT BANI</button>
-  <button id="aboutToggle">BY: M. SYAHIRUDDIN, S.T</button>
+  <button id="aboutToggle">DIBUAT OLEH</button>
 </div>
 
 <div class="modal" id="profileModal" aria-hidden="true">
@@ -111,7 +99,6 @@ html,body{margin:0;height:100%;font-family:Arial,sans-serif}body{overflow:hidden
 
 <script src="supabase-config.js"></script>
 <script src="data.js"></script>
-<script src="assets/app.js?v=280"></script>
-<script src="assets/pwa.js?v=280"></script>
+<script src="assets/app.js"></script>
 </body>
 </html>

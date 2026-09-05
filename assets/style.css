@@ -62,25 +62,20 @@ body.no-tree-effects .lines path{animation:none!important;stroke-dasharray:none!
   .subtitle{font-size:12px}
 }
 
-/* V2.6 — auto camera framing seperti referensi */
-.world{transition:transform 900ms cubic-bezier(.16,1,.3,1)}
-.viewport.dragging .world{transition:none!important}
+/* V2.6 — multi pasangan & pelacakan jalur keturunan */
+.tree-node .spouse-list{display:grid;gap:4px;margin-top:7px}
+.tree-node .spouse-line{display:flex;align-items:center;gap:7px;font-size:11px;line-height:1.2;background:rgba(255,255,255,.48);border-radius:7px;padding:3px 6px}
+.tree-node .spouse-line span{font-size:9px;font-weight:900;text-transform:uppercase;white-space:nowrap;padding:2px 5px;border-radius:999px;background:#e7edf8;color:#33445f}
+.tree-node .spouse-line b{font-size:11px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tree-node.root .spouse-list{margin:7px 12px 2px}.tree-node.root .spouse-line{justify-content:flex-start;text-align:left}
+.tree-node.root .spouse-line b{font-size:12px}
+.via-spouse{margin-top:6px;padding:3px 6px;border-radius:6px;font-size:9px;font-weight:900;line-height:1.25;background:rgba(255,255,255,.65);border-left:4px solid #7387a6;color:#34445d}
+.via-1{border-left-color:#4c8bf5}.via-2{border-left-color:#2ca96d}.via-3{border-left-color:#e89b24}.via-4{border-left-color:#9467d7}.via-5{border-left-color:#d45a88}.via-6{border-left-color:#2c9fa3}
+.lines .line-via-1{stroke:#4c8bf5}.lines .line-via-2{stroke:#2ca96d}.lines .line-via-3{stroke:#e89b24}.lines .line-via-4{stroke:#9467d7}.lines .line-via-5{stroke:#d45a88}.lines .line-via-6{stroke:#2c9fa3}
+.profile-spouses{display:grid;gap:6px;margin-top:10px}.profile-spouses>div{display:flex;gap:8px;align-items:center;padding:7px 9px;border-radius:9px;background:#f3f6fb}.profile-spouses span{font-size:11px;font-weight:900;text-transform:uppercase;color:#5c6b83;min-width:82px}.profile-spouses b{font-size:13px}.profile-route{margin-top:8px;padding:8px 10px;background:#eef5ff;border-radius:9px;line-height:1.45}
+.spouse-editor-box{border:1px solid #dfe6ef;border-radius:12px;padding:12px;margin:4px 0 14px;background:#f9fbfe}.spouse-editor-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:9px}.spouse-editor-head strong{font-size:13px;color:#3d4b63}.spouse-editor-head small{display:block;font-weight:500;color:#7b889c;margin-top:3px;line-height:1.35}.small-btn{padding:8px 10px!important;font-size:12px;white-space:nowrap}.spouse-editor{display:grid;gap:8px}.spouse-empty{font-size:12px;color:#7b889b;padding:8px;border:1px dashed #cbd6e4;border-radius:9px;background:#fff}.spouse-edit-row{display:grid;grid-template-columns:64px 105px 1fr 34px;gap:6px;align-items:end;padding:8px;background:#fff;border:1px solid #e1e7ef;border-radius:10px}.spouse-edit-row label{margin:0!important;font-size:10px!important}.spouse-edit-row input{padding:8px!important;margin-top:3px!important}.sp-remove{width:34px;height:36px;padding:0!important;font-size:20px!important}.field-help{display:block;margin-top:5px;color:#7d899b;font-size:11px;font-weight:500;line-height:1.4}.route-warning{display:inline-block;color:#b06c00;background:#fff3cd;border-radius:999px;padding:1px 6px;font-weight:800;margin-left:3px}
+#parentSpouse:disabled{background:#f0f3f7;color:#8995a7}
 @media(max-width:680px){
-  .world{transition-duration:820ms}
+  .spouse-editor-head{flex-direction:column}.small-btn{width:100%}.spouse-edit-row{grid-template-columns:70px 1fr 38px}.spouse-edit-row .sp-name-wrap{grid-column:1/3}.spouse-edit-row .sp-remove{grid-column:3;grid-row:1/3;height:100%}
+  .tree-node .spouse-line{gap:4px}.tree-node .spouse-line span{font-size:8px}.tree-node .spouse-line b{font-size:10px}
 }
-\n\n/* V2.7 — klik kartu lebih mudah + komposisi leluhur lebih seimbang */
-.tree-node.has-children{cursor:pointer}
-.tree-node.has-children:hover{box-shadow:0 11px 26px rgba(26,45,76,.18)}
-.tree-node.has-children:active{filter:brightness(.97)}
-/* Tanda +/- tetap menjadi petunjuk visual, tetapi seluruh kartu adalah area klik. */
-.tree-node .toggle{z-index:3}
-@media(max-width:680px){
-  .tree-node.has-children:active{transform:scale(.995)}
-}
-
-
-/* V2.8 — PWA / Android install */
-.install-app{background:#16a36a!important;color:#fff!important;white-space:nowrap}
-.install-app.ready{animation:installPulse 1.8s ease-in-out infinite;box-shadow:0 0 0 0 rgba(22,163,106,.35)}
-@keyframes installPulse{50%{transform:translateY(-1px);box-shadow:0 0 0 8px rgba(22,163,106,0)}}
-@media(max-width:680px){.install-app{width:auto!important;flex:1 1 160px}}
